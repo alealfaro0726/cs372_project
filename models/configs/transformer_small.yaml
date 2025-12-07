@@ -1,0 +1,66 @@
+# Small Transformer configuration for fast training and debugging
+# Use this for quick iterations on CPU or small datasets
+
+model:
+  name: "transformer_small"
+  d_model: 256              # Embedding dimension (reduced from 512)
+  n_heads: 4                # Number of attention heads (reduced from 8)
+  n_layers: 2               # Number of transformer layers (reduced from 6)
+  d_ff: 512                 # Feed-forward dimension (reduced from 2048)
+  dropout: 0.1              # Dropout rate
+  max_seq_len: 512          # Maximum sequence length
+
+  # Conditioning
+  use_image_conditioning: true
+  use_emotion_conditioning: true
+  image_embed_dim: 512      # CLIP embedding size
+  emotion_embed_dim: 64     # Learned emotion embedding size
+
+training:
+  epochs: 20                # Increased for better convergence
+  batch_size: 16            # Smaller batch size for CPU
+  learning_rate: 0.0003     # Lower LR for more stable training
+  weight_decay: 0.01        # L2 regularization
+
+  # Learning rate schedule
+  warmup_steps: 500
+  lr_scheduler: "cosine"    # Options: cosine, plateau, step
+
+  # Optimization
+  optimizer: "adamw"        # AdamW optimizer
+  grad_clip: 1.0            # Gradient clipping threshold
+  mixed_precision: true     # Use AMP if GPU available
+
+  # Regularization
+  label_smoothing: 0.15     # Increased label smoothing to prevent overconfidence
+
+  # Checkpointing
+  save_every: 5             # Save checkpoint every N epochs
+  eval_every: 1             # Evaluate every N epochs
+  early_stopping_patience: 8
+
+data:
+  train_split: 0.8
+  val_split: 0.1
+  test_split: 0.1
+
+  # Data augmentation
+  augment_transpose: true   # Random pitch transposition
+  transpose_range: [-3, 3]  # Semitones
+
+  augment_tempo: true       # Random tempo scaling
+  tempo_range: [0.9, 1.1]   # Ratio
+
+sampling:
+  temperature: 1.2          # Higher temperature for more diversity
+  top_k: 50                 # Larger top-k for more variety
+  top_p: 0.95               # Higher nucleus sampling
+  max_length: 256           # Maximum generation length
+
+seed: 42                    # Random seed for reproducibility
+
+logging:
+  log_dir: "logs"
+  tensorboard: false        # Enable TensorBoard logging
+  wandb: false              # Enable Weights & Biases
+  log_interval: 50          # Log every N batches
