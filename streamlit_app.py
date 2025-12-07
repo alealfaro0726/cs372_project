@@ -209,10 +209,7 @@ if 'visual_analysis' in st.session_state and 'image_path' in st.session_state:
                     visual = st.session_state['visual_analysis']
                     st.info(f"**Style:** {', '.join(visual['style_tags'][:3])} | **Atmosphere:** {', '.join(visual['atmosphere_tags'][:2])}")
 
-                if AUDIO_AVAILABLE:
-                    audio_path = output_dir / "generated.wav"
-                    midi_to_audio(str(output_path), str(audio_path))
-                    st.audio(str(audio_path), format='audio/wav')
+                # Audio playback removed for Streamlit deployment stability; MIDI download still available.
 
                 timestamp = st.session_state.get('visual_analysis', {}).get('key_suggestion', 'generated')
                 st.markdown(

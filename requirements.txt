@@ -17,4 +17,3 @@ soundfile
 scipy
 regex
 keyboard
-fluidsynth
