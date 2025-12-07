@@ -98,7 +98,7 @@ with col1:
     )
 
     if uploaded_file is not None:
-        st.image(uploaded_file, caption="Uploaded Image", width=None)
+        st.image(uploaded_file, caption="Uploaded Image", use_container_width=True)
 
         with tempfile.NamedTemporaryFile(delete=False, suffix='.jpg') as tmp_file:
             tmp_file.write(uploaded_file.read())
