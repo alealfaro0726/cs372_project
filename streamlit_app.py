@@ -124,12 +124,6 @@ with col2:
     if 'visual_analysis' in st.session_state:
         result = st.session_state['visual_analysis']
 
-        st.subheader("Musical Mapping")
-        col_m1, col_m2, col_m3 = st.columns(3)
-        col_m1.metric("Key/Mode", f"{result['key_suggestion']} {result['scale_mode']}")
-        col_m2.metric("Tempo", f"{result['tempo_bpm']} BPM")
-        col_m3.metric("Intensity", f"{result['intensity']:.2f}")
-
         st.markdown("**Instruments:**")
         st.write(", ".join(result['primary_instruments']))
 
@@ -158,11 +152,12 @@ if 'visual_analysis' in st.session_state and 'image_path' in st.session_state:
     st.header("Generate Music")
 
     with st.expander("Advanced Settings"):
-        max_length = st.slider("Max Length", 256, 2048, 1024)
-        temperature = st.slider("Temperature", 0.1, 2.0, 0.9, 0.1)
-        top_k = st.slider("Top K", 0, 100, 40)
-        top_p = st.slider("Top P", 0.0, 1.0, 0.95, 0.05)
-        theory_weight = st.slider("Theory Weight", 0.0, 1.0, 0.3, 0.05)
+        st.caption("Adjust generation controls (advanced). Defaults are tuned for balanced, coherent music.")
+        max_length = st.slider("Song Length (tokens)", 256, 2048, 1024, help="Rough upper bound on how many notes/events to generate.")
+        temperature = st.slider("Creativity", 0.1, 2.0, 0.9, 0.1, help="Higher = more surprising/varied; lower = safer/more predictable.")
+        top_k = st.slider("Focus (Top-K)", 0, 100, 40, help="Lower = more focused choices; higher = wider choices. Set 0 to disable.")
+        top_p = st.slider("Variety (Top-P)", 0.0, 1.0, 0.95, 0.05, help="Lower = more conservative; higher = more variety. Set 0 to disable.")
+        theory_weight = 0.7  # fixed 70% theory, no slider
 
     if st.button("Generate Music", type="primary", use_container_width=True):
         with st.spinner("Generating music..."):
@@ -215,13 +210,9 @@ if 'visual_analysis' in st.session_state and 'image_path' in st.session_state:
                     st.info(f"**Style:** {', '.join(visual['style_tags'][:3])} | **Atmosphere:** {', '.join(visual['atmosphere_tags'][:2])}")
 
                 if AUDIO_AVAILABLE:
-                    try:
-                        audio_path = output_dir / "generated.wav"
-                        midi_to_audio(str(output_path), str(audio_path))
-                        st.audio(str(audio_path), format='audio/wav')
-                    except Exception as audio_error:
-                        st.warning(f"Audio playback unavailable: {str(audio_error)}")
-                        st.info("Download the MIDI file below to listen")
+                    audio_path = output_dir / "generated.wav"
+                    midi_to_audio(str(output_path), str(audio_path))
+                    st.audio(str(audio_path), format='audio/wav')
 
                 timestamp = st.session_state.get('visual_analysis', {}).get('key_suggestion', 'generated')
                 st.markdown(
