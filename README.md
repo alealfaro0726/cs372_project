@@ -45,12 +45,6 @@ Image → Visual Analysis → Feature Extraction → Hybrid Model → MIDI Outpu
    - Motif-based melodies so it doesn't sound random
    - Everything stays in key
 
-4. **Piano Enhancer** (`piano_performance_enhancer.py`)
-   - 6 left-hand patterns (stride, alberti bass, broken chords, etc.)
-   - Chord voicings that sound good
-   - Timing/velocity humanization so it's not robotic
-   - Pedal simulation
-
 5. **Web UI** (`streamlit_app.py`)
    - Upload images and see visual analysis
    - Generate and play back music
