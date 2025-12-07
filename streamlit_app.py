@@ -124,9 +124,6 @@ with col2:
     if 'visual_analysis' in st.session_state:
         result = st.session_state['visual_analysis']
 
-        st.markdown("**Instruments:**")
-        st.write(", ".join(result['primary_instruments']))
-
         with st.expander("Color Analysis"):
             color_info = result['color_analysis']
             st.write(f"**Temperature:** {color_info['temperature']}")
