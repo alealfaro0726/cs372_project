@@ -13,7 +13,7 @@ This project takes any image you give it and turns it into music that feels like
 ## Evaluation
 
 - Training setup: ConditionalTransformer (~22M params: d_model=256, n_heads=4, n_layers=2, d_ff=512, max_seq_len=1024, dropout=0.1, image_embed_dim=512, emotion_embed_dim=64); AdamW; 20 epochs; cross-entropy loss; train/val/test split over the expanded MIDI corpus (~17k files in `data/midi_files/archive/`) with tokenization + CLIP embeddings.
-- Run profile: batch size 8–16; 20 epochs; mixed precision optional; grad clipping enabled; cosine/plateau schedulers supported; wall-clock ~X hours on GPU (fill in based on your run).
+- Run profile: batch size 8–16; 20 epochs; mixed precision optional; grad clipping enabled; cosine/plateau schedulers supported;
 - Perplexity (val): ~150–200 at epoch 1 → ~30–50 by epoch 20.
 - Loss: steady downward trend; best checkpoint selected by lowest val loss; no late-epoch divergence observed in baseline runs.
 - Metrics tracked: train/val loss, learning rate, perplexity; curves logged to `docs/training_curves.png`.
