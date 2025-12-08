@@ -1,18 +1,8 @@
 # Setup
 
-Quick guide to getting this running.
+Access the hosted app directly here (no install needed): https://alealfaro0726-cs372-project-streamlit-app-svekpw.streamlit.app/
 
-## What you need
-
-### Hardware
-- 8GB RAM minimum, 16GB better
-- 2-5GB free disk space
-- GPU optional but speeds things up (CUDA or M1/M2)
-
-### Software
-- Python 3.8+ (3.9-3.11 works best)
-- macOS, Linux, or Windows
-- FluidSynth optional (for audio playback)
+OR installation steps below:
 
 ## Install
 
@@ -23,21 +13,7 @@ git clone <repository-url>
 cd cs372_project_ai
 ```
 
-### 2. Virtual environment (recommended)
-
-**macOS/Linux:**
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
-**Windows:**
-```bash
-python -m venv venv
-venv\Scripts\activate
-```
-
-### 3. Install dependencies
+### 2. Install dependencies
 
 ```bash
 pip install --upgrade pip
@@ -135,64 +111,6 @@ python src/sample.py \
     --theory_weight 0.3 \
     --output output.mid
 ```
-
-## Troubleshooting
-
-### Issue: "Module not found" errors
-
-**Solution:**
-```bash
-# Ensure you're in the virtual environment
-# Reinstall requirements
-pip install -r requirements.txt --force-reinstall
-```
-
-### Issue: CUDA out of memory
-
-**Solution:**
-The model will automatically fall back to CPU. 
-
-
-### Issue: "Vocabulary not found" error
-
-**Solution:**
-Ensure `data/processed/vocab.json` exists. This file should be included in the repository.
-
-## Advanced Configuration
-
-### Changing Model Settings
-
-Edit `streamlit_app.py` to modify:
-- Default temperature
-- Top-k/top-p values
-- Theory weight
-- Generation length
-
-### Training Your Own Model
-
-```bash
-# Preprocess MIDI data
-python src/preprocess_midi.py
-
-# Preprocess images
-python src/preprocess_images.py
-
-# Train model
-python src/train.py --config models/configs/transformer_small.yaml
-```
-
-## Performance Optimization
-
-### For Faster Generation:
-1. Use GPU if available (CUDA or MPS)
-2. Use music_theory mode (bypasses ML model)
-3. Reduce max_length parameter
-4. Lower temperature value
-
-### For Better Quality:
-1. Use hybrid mode with theory_weight=0.3
-2. Increase max_length for longer pieces
-3. Experiment with temperature (0.8-1.0)
 
 ## Stopping the Application
 
