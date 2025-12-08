@@ -9,7 +9,7 @@ OR installation steps below:
 ### 1. Clone
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/alealfaro0726/cs372_project_ai.git
 cd cs372_project_ai
 ```
 
