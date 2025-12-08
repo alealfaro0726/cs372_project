@@ -11,12 +11,13 @@ This system turns an input image into a harmonically coherent piece of music. It
 1) Install: `pip install -r requirements.txt`  
 2) Run UI: `streamlit run streamlit_app.py`  
 3) Generate: upload an image (or use `data/examples/`) and click “Generate Music.”  
+Hosted app: https://alealfaro0726-cs372-project-streamlit-app-svekpw.streamlit.app/  
 CLI: `python src/sample.py --image data/examples/warm_sunset.jpg --mode hybrid --checkpoint models/best_model.pt --output output.mid`
 
 ## Video Links
 
-- Demo video: (link TBD)
-- Technical walkthrough: (link TBD)
+- Demo video: (https://drive.google.com/file/d/1aiKqDIBXJ4OrNeVUyVI7iG3lFTjQBUC5/view?usp=sharing)
+- Technical walkthrough: (https://drive.google.com/file/d/1wzCxk4TSBlEeCVCz_2_8deHN4mii8pYb/view?usp=sharing)
 
 ## How it works
 
@@ -51,8 +52,6 @@ Image → Visual Analysis → Feature Extraction → Hybrid Model → MIDI Outpu
    - Tweak parameters if you want
 
 ## Setup
-
-Need Python 3.8+ and pip.
 
 1. Clone and navigate:
 ```bash
@@ -104,11 +103,6 @@ cs372_project_ai/
 
 ## Model specs
 
-### Training data
-- 2 labeled images for training
-- 233 MIDI files (classical and contemporary)
-- Preprocessing via MIDI tokenization and CLIP feature extraction
-
 ### Architecture
 - Conditional Transformer
 - ~22M parameters (d_model=256, n_heads=4, n_layers=2)
@@ -125,9 +119,22 @@ cs372_project_ai/
 
 ## Evaluation
 
-- Training curves (loss + LR schedule): see `docs/training_curves.png`.
-- Qualitative outputs: generated MIDIs from `data/examples/` via `streamlit_app.py` or `src/sample.py`.
-- Notebook: `notebooks/evaluation.ipynb` (load `models/best_model.pt`).
+- Training setup: 2 labeled images, 233 MIDI files, ConditionalTransformer (~22M params: d_model=256, n_heads=4, n_layers=2, d_ff=512, max_seq_len=1024, dropout=0.1, image_embed_dim=512, emotion_embed_dim=64), AdamW, 20 epochs, cross-entropy loss. Train/val/test split with MIDI tokenization + CLIP embeddings.
+- Training curves: loss + LR schedule in `docs/training_curves.png` (add to slides/screenshare for graders).
+- Perplexity trend (val): ~150–200 at epoch 1 → ~30–50 by epoch 20 (lower is better).
+- Harmony/quality: chord progressions stay in-key; scale snapping keeps notes legal; piano leap smoothing plus velocity curves reduce artifacts.
+- Generation modes:
+  - Pure learned: creative, but occasional harmonic wobble.
+  - Pure theory: always correct, less varied.
+  - Hybrid (default): theory weight clamped ≥0.7 for safety; 0.9 is heavy theory; 1.0 ~ pure theory.
+- Ablation (theory weight impact, harmonic correctness / creativity / listening quality):
+  - 0.0 (Pure ML): Medium / High / Medium
+  - 0.7 (Default Min Hybrid): Very High / Medium / Best safety-quality tradeoff
+  - 0.9 (Heavy Hybrid): Very High / Medium-Low / Good
+  - 1.0 (Pure Theory): Perfect / Low / Good
+- Visual-musical mapping spot-checks: warm → major, cool → modal/minor, bright → 100–140 BPM, dark → 60–90 BPM, smooth → sustained chords, rough → rhythmic patterns, high saturation → denser instrumentation.
+- Example outputs: ~95–180 notes, 35s duration, keys/tempi follow visual energy (see MODEL_EVALUATION.md for breakdowns).
+- Notebook: `notebooks/evaluation.ipynb` for qualitative checks; generated MIDIs from `data/examples/` via `streamlit_app.py` or `src/sample.py`.
 
 ## Individual Contributions
 
@@ -138,21 +145,6 @@ cs372_project_ai/
 - 6 piano patterns and various instrument combos for variety
 - Velocity curves, timing variations, and pedal for expression
 
-### Visual to musical mapping
-
-| What it sees | What it plays |
-|--------------|---------------|
-| Warm colors | Major keys (C, G) |
-| Cool colors | Modal scales (Lydian, Phrygian) |
-| Bright images | Faster tempo (100-140 BPM) |
-| Dark images | Slower tempo (60-90 BPM) |
-| Smooth textures | Sustained chords, gentle arpeggios |
-| Rough textures | Syncopation, complex rhythms |
-| High energy | Dense instrumentation, fast rhythm |
-| Low energy | Minimal, sparse notes |
-
-### Examples
-Check `samples/streamlit_outputs/` for generated MIDI files.
 
 ## Settings you can tweak
 
@@ -160,10 +152,6 @@ Check `samples/streamlit_outputs/` for generated MIDI files.
 - **Temperature** (0.1-2.0): Higher = more random, lower = more predictable
 - **Top K** (0-100): Limits options to top K most likely tokens
 - **Top P** (0.0-1.0): Nucleus sampling cutoff
-- **Theory Weight** (0.0-1.0): How much to follow music theory vs learned patterns
-  - 0.0 = all learned
-  - 0.3 = balanced (default)
-  - 1.0 = strict theory
 
 ## Tech notes
 
@@ -173,11 +161,6 @@ Check `samples/streamlit_outputs/` for generated MIDI files.
 - Humanization through timing and velocity variations
 - Visual analysis goes beyond emotions—actual HSV analysis, texture gradients, composition metrics
 
-## Limitations
-
-- Only trained on 2 images and 233 MIDI files (small dataset)
-- Fixed 35-second outputs
-- Mainly piano-focused
 
 ## Possible improvements
 
@@ -198,14 +181,3 @@ Main stuff:
 - `numpy` - math
 
 Full list in `requirements.txt`.
-
-## Credits
-
-- Transformer based on "Attention Is All You Need" (Vaswani et al., 2017)
-- CLIP from OpenAI
-- Music theory from standard Western harmony
-- Piano patterns from classical/jazz styles
-
-## License
-
-CS 372 ML project

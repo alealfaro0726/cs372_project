@@ -12,8 +12,6 @@ streamlit
 Pillow
 opencv-python-headless
 transformers
-torchvision
 soundfile
 scipy
 regex
-keyboard

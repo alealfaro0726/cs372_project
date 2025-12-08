@@ -87,12 +87,12 @@ Model gets decent perplexity on validation, meaning it's learning to predict tok
 
 ### 3. Hybrid (Recommended)
 - **Pros**: Balances creativity with correctness
-- **Theory Weight**: Adjustable (0.0-1.0)
-  - 0.0 = Pure learned
-  - 0.3 = Balanced (default)
-  - 1.0 = Heavy music theory
-- **Cons**: Slightly slower than pure modes
-- **Use Case**: Production-quality music generation
+- **Theory Weight**: Clamped to ≥0.7 in the current implementation
+  - 0.7 = default minimum (lean-theory baseline)
+  - 0.9 = heavy theory
+  - 1.0 = pure theory (close to rule-based mode)
+- **Cons**: Slightly slower than pure modes; intentionally prevents low-theory settings
+- **Use Case**: Production-quality music generation with harmonic safeguards
 
 ## Example Outputs Analysis
 
@@ -151,61 +151,11 @@ Model gets decent perplexity on validation, meaning it's learning to predict tok
 | Theory Weight | Harmonic Correctness | Creativity Score | Listening Quality |
 |---------------|---------------------|------------------|------------------|
 | 0.0 (Pure ML) | Medium | High | Medium |
-| 0.3 (Balanced) | High | High | **Best** |
-| 0.7 (Heavy) | Very High | Medium | Good |
+| 0.7 (Default Min Hybrid) | Very High | Medium | **Best safety/quality tradeoff** |
+| 0.9 (Heavy Hybrid) | Very High | Medium-Low | Good |
 | 1.0 (Pure Theory) | Perfect | Low | Good |
 
-**Conclusion**: Theory weight of 0.3 provides optimal balance.
-
-### Impact of Piano Enhancement
-
-| Feature | Without Enhancement | With Enhancement | Improvement |
-|---------|-------------------|------------------|-------------|
-| Harmonic Richness | Basic melody only | Full arrangement | +300% |
-| Dynamic Expression | Flat velocity | Velocity curves | +150% |
-| Humanization | Robotic timing | Natural timing | +200% |
-| Listening Quality | 3/10 | 8/10 | +167% |
-
-## Limitations
-
-### Current Challenges
-1. **Limited Training Data**: Only 2 image-MIDI pairs for supervised learning
-2. **Fixed Duration**: Generates exactly 35 seconds
-3. **Instrument Variety**: Primarily piano-focused
-4. **Memory**: ~22M parameters may limit complexity
-
-### Known Issues
-1. Occasional timing quantization artifacts
-2. Limited understanding of complex compositions
-3. Simple visual features (no object recognition)
-4. No user feedback loop for improvement
-
-## Future Improvements
-
-### Short-term (Next Version)
-- [ ] Expand training dataset (100+ image-music pairs)
-- [ ] Add variable-length generation
-- [ ] More instrument types (guitar, drums, synths)
-- [ ] User rating system for outputs
-
-### Long-term (Research Direction)
-- [ ] Multi-modal attention mechanism
-- [ ] Style transfer (match specific composer styles)
-- [ ] Video-to-music generation
-- [ ] Real-time generation for live visuals
-- [ ] Larger model (100M+ parameters)
-
-## Benchmarks
-
-### Generation Speed
-- **CPU**: ~15-30 seconds per piece
-- **MPS (Apple Silicon)**: ~8-15 seconds per piece
-- **CUDA (GPU)**: ~5-10 seconds per piece
-
-### Resource Usage
-- **Memory**: ~2GB RAM (inference)
-- **Storage**: 22MB (model checkpoint)
-- **Audio**: ~500KB per MIDI file
+**Conclusion**: With the enforced ≥0.7 clamp, the default hybrid setting favors harmonic safety; use pure learned mode for maximum creativity or pure theory for guaranteed correctness.
 
 ## Conclusion
 
@@ -214,11 +164,3 @@ The hybrid Image-to-Music Generator successfully combines:
 2. **Learned Patterns**: Transformer model for creative melodies
 3. **Music Theory**: Harmonic correctness and structure
 4. **Piano Artistry**: Professional arrangements with expression
-
-**Overall Quality Score: 8/10**
-- Harmonic Correctness: 9/10
-- Creativity: 7/10
-- Technical Quality: 9/10
-- Listening Experience: 8/10
-
-The system produces musically-correct, expressive compositions that genuinely reflect visual attributes, making it suitable for creative applications, film scoring, and music education.
