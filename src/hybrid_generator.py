@@ -35,14 +35,12 @@ class HybridMusicGenerator:
         theory_weight: float = 0.7,
         target_duration: float = 35.0
     ) -> pretty_midi.PrettyMIDI:
-        # For calm/sunset-like moods, reduce randomness and density at the source
         if emotion_name in {"calm", "sad"}:
             temperature = min(temperature, 0.7)
             top_k = min(top_k, 12) if top_k is not None else 12
             top_p = min(top_p, 0.8) if top_p is not None else 0.8
             max_length = min(max_length, 140)
 
-        # Enforce 70% theory baseline
         theory_weight = max(theory_weight, 0.7)
 
         with torch.no_grad():
@@ -149,7 +147,7 @@ class HybridMusicGenerator:
         scale = emotion_gen.scale
         root = emotion_gen.root_note
 
-        theory_weight = max(0.7, theory_weight)  # keep 70% theory as requested
+        theory_weight = max(0.7, theory_weight)  
 
         max_time = max(
             max([n.end for n in theory_notes]) if theory_notes else 0,
@@ -231,7 +229,7 @@ class HybridMusicGenerator:
         active_notes = {}
         current_time = 0.0
         ticks_per_second = (tempo / 60.0) * self.tokenizer.ticks_per_bin
-        last_pitch = None  # track last piano pitch for smoothing
+        last_pitch = None 
 
         for event_type, pitch, velocity, time_delta in events:
             current_time += time_delta / ticks_per_second
@@ -240,7 +238,6 @@ class HybridMusicGenerator:
                 break
 
             if event_type == 'note_on':
-                # Smooth piano jumps: if last pitch exists, constrain octave to nearest
                 if last_pitch is not None:
                     while pitch - last_pitch > 7:
                         pitch -= 12
@@ -283,7 +280,7 @@ class HybridMusicGenerator:
         return self._trim_midi(midi, max_duration) if max_duration is not None else midi
 
     def _trim_midi(self, midi: pretty_midi.PrettyMIDI, duration: float) -> pretty_midi.PrettyMIDI:
-        """Cut all notes to the target duration to avoid overly long songs."""
+        """cut all notes to the target duration to avoid overly long songs."""
         if duration is None:
             return midi
 
@@ -303,11 +300,10 @@ class HybridMusicGenerator:
         return trimmed
 
     def _sanitize_midi(self, midi: pretty_midi.PrettyMIDI) -> pretty_midi.PrettyMIDI:
-        """Clamp pitch/velocity to valid MIDI bytes to avoid mido errors."""
+        """clamp pitch/velocity to valid MIDI bytes to avoid mido errors."""
         sanitized = pretty_midi.PrettyMIDI(initial_tempo=midi.get_tempo_changes()[1][0])
         for inst in midi.instruments:
             new_inst = pretty_midi.Instrument(program=int(inst.program), is_drum=inst.is_drum, name=inst.name)
-            # Smoothing for piano melody: avoid huge leaps and keep to a comfortable range.
             if not inst.is_drum and inst.program == 0:
                 sorted_notes = sorted(inst.notes, key=lambda n: (n.start, n.end))
                 prev_pitch = None
@@ -352,9 +348,8 @@ class HybridMusicGenerator:
         ticks_per_second: float,
         emotion: Optional[str] = None
     ) -> pretty_midi.PrettyMIDI:
-        """Snap learned output to the target scale, align to a grid, deduplicate dense hits, and soften dynamics."""
         if emotion in ["calm", "sad"]:
-            grid = 1.2  # even coarser grid for relaxation
+            grid = 1.2 
             max_notes_per_second = 1
             min_duration = 0.35
             default_velocity_scale = 0.65
@@ -367,16 +362,16 @@ class HybridMusicGenerator:
 
         for inst in midi.instruments:
             velocity_scale = default_velocity_scale
-            if emotion in ["calm", "sad"] and inst.program == 40:  # violin
+            if emotion in ["calm", "sad"] and inst.program == 40:  
                 velocity_scale = 0.65
             new_inst = pretty_midi.Instrument(program=inst.program, is_drum=inst.is_drum, name=inst.name)
-            recent = {}  # (cell -> set of pitches) to prevent spam
-            density_counter = {}  # cell -> count
+            recent = {}
+            density_counter = {} 
             for n in inst.notes:
                 start = round(n.start / grid) * grid
                 end = max(start + 0.1, round(n.end / grid) * grid)
 
-                if end - start < min_duration:  # drop ultra-short blips
+                if end - start < min_duration:
                     continue
 
                 cell = round(start / grid)
@@ -395,7 +390,7 @@ class HybridMusicGenerator:
                     pitch = n.pitch
 
                 if pitch in seen:
-                    continue  # prevent stacking identical hits in same grid cell
+                    continue
                 seen.add(pitch)
 
                 new_inst.notes.append(pretty_midi.Note(
@@ -425,8 +420,7 @@ class HybridMusicGenerator:
                 end = max(n.end, start + sustain_min)
                 end = min(end, start + sustain_max)
 
-                # Extend piano sustains more to feel like held chords with reverb tail
-                if inst.program == 0:  # piano
+                if inst.program == 0: 
                     end = min(end + 0.8, start + sustain_max + 0.5)
                     vel = min(n.velocity, 68)
                 else:

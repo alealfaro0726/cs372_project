@@ -51,7 +51,7 @@ class EmotionMusicGenerator:
     }
 
     FAMILY_PROGRAMS: Dict[str, list] = {
-        'piano_keys': list(range(0, 8)),  # acoustic pianos
+        'piano_keys': list(range(0, 8)), 
         'electric_keys': list(range(4, 16)),
         'mallets': list(range(9, 16)),
         'guitars': list(range(24, 32)),
@@ -183,8 +183,6 @@ class EmotionMusicGenerator:
         self.instruments = self._select_instruments(base_inst)
 
     def _select_instruments(self, defaults: Dict) -> Dict:
-        """Pick 3-6 instrument families with highest scores and sample programs within families."""
-        # Simple scoring based on emotion; could be extended with image hue/contrast features.
         emotion_bias = {
             'happy': {'strings': 0.8, 'piano_keys': 0.8, 'woodwinds': 0.6, 'mallets': 0.6, 'brass': 0.5, 'pads': 0.4},
             'sad': {'strings': 0.8, 'woodwinds': 0.7, 'piano_keys': 0.6, 'pads': 0.6, 'basses': 0.5},
@@ -210,7 +208,6 @@ class EmotionMusicGenerator:
             return int(self.rng.choice(programs))
 
         selected = dict(defaults)
-        # Replace melody/harmony/additional with chosen families where sensible
         if 'melody' in selected:
             fam = picked[0]
             prog = pick_program(fam)
@@ -231,14 +228,12 @@ class EmotionMusicGenerator:
             prog = pick_program(fam)
             if prog is not None:
                 selected['woodwind'] = (prog, f'Auto-{fam}')
-        # Bass: prefer bass/synth_bass families
         bass_fams = [f for f in picked if f in ('basses', 'synth_bass')]
         if bass_fams:
             prog = pick_program(bass_fams[0])
             if prog is not None:
                 selected['bass'] = (prog, f'Auto-{bass_fams[0]}')
 
-        # Add a guitar comp layer if a guitar family scored well
         guitar_fams = [f for f in picked if f in ('guitars',)]
         if guitar_fams:
             prog = pick_program(guitar_fams[0])
@@ -310,7 +305,7 @@ class EmotionMusicGenerator:
 
             base_vel = max(38, self.velocity - 40)
             jitter = float(self.rng.uniform(-0.08, 0.08))
-            octave_lift = int(self.rng.choice([0, 12, 12, 0]))  # sometimes lift for air
+            octave_lift = int(self.rng.choice([0, 12, 12, 0])) 
 
             if style == 'sustain':
                 for idx, interval in enumerate(chord_voicing[:3]):
@@ -337,7 +332,6 @@ class EmotionMusicGenerator:
                     )
                     harmony.notes.append(note)
             elif style == 'half-drop':
-                # play only two tones with a soft drop, leaving space
                 picked = chord_voicing[:2]
                 for idx, interval in enumerate(picked):
                     pitch = self.root_note + interval - (12 if idx == 0 else 0) + octave_lift
@@ -350,7 +344,7 @@ class EmotionMusicGenerator:
                         end=start + chord_duration * 0.6
                     )
                     harmony.notes.append(note)
-            else:  # arp
+            else: 
                 arp_delay = 0.18
                 for idx, interval in enumerate(chord_voicing[:3]):
                     pitch = self.root_note + interval - (12 if idx == 0 else 0) + octave_lift
@@ -380,8 +374,7 @@ class EmotionMusicGenerator:
         current_time = 0.0
 
         for chord_intervals in self.chord_progression:
-            # choose a color tone per chord (3rd, 5th, 9th) with gentle rhythm
-            choice = int(self.rng.choice([1, 2, 2, 0]))  # bias to 5th/9th
+            choice = int(self.rng.choice([1, 2, 2, 0]))
             interval = chord_intervals[min(choice, len(chord_intervals) - 1)]
             octave_lift = int(self.rng.choice([12, 0, 12]))
             pitch = self.root_note + interval + octave_lift
@@ -504,7 +497,7 @@ class EmotionMusicGenerator:
 
     def generate_drums(self) -> pretty_midi.Instrument:
         if self.emotion == 'calm':
-            return pretty_midi.Instrument(program=0, is_drum=True, name='Drums (muted)')  # effectively no drums
+            return pretty_midi.Instrument(program=0, is_drum=True, name='Drums (muted)') 
 
         drums = pretty_midi.Instrument(program=0, is_drum=True, name='Drums')
 
@@ -674,7 +667,7 @@ class EmotionMusicGenerator:
         if guitar is not None:
             midi.instruments.append(guitar)
 
-        if self.emotion != 'calm':  # keep calm pieces extra sparse and smooth
+        if self.emotion != 'calm': 
             from musical_expression import enhance_musical_expression
             midi = enhance_musical_expression(midi, emotion=self.emotion)
 
